@@ -1,0 +1,5 @@
+dvc[gdrive]
+numpy
+torch
+fastapi
+pandas
