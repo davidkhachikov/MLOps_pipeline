@@ -1,0 +1,5 @@
+outs:
+- md5: 639da4435574f376893a59445f45e4af
+  size: 4602902
+  hash: md5
+  path: chunk.csv

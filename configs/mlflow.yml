@@ -1,0 +1,21 @@
+- name: "Adam_default_explr"
+  optimizer:
+    module_name: torch.optim
+    class_name: Adam
+    params: {}
+  scheduler:
+    module_name: torch.optim.lr_scheduler
+    class_name: ExponentialLR
+    params:
+      gamma: 0.95
+
+- name: "RMSprop_default_explr"
+  optimizer:
+    module_name: torch.optim
+    class_name: RMSprop
+    params: {}
+  scheduler:
+    module_name: torch.optim.lr_scheduler
+    class_name: ExponentialLR
+    params:
+      gamma: 0.95

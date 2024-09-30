@@ -1,0 +1,11 @@
+BASE_DIR: /home/user/pmldl/assignment1
+RAW_DATA: ./data/raw/tweets.csv
+PROCESSED_PATH: ./data/processed/chunk.csv
+TRAIN_TEST_PATH: ./code/datasets
+TRAINED_MODEL_PATH: models/best.pth
+DOCKER_PORT: 5001
+WEB_PORT: 5155
+data:
+  num_samples: 5
+  test_size: 0.2
+  random_state: 42
