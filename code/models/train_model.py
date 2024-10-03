@@ -221,7 +221,7 @@ def train():
 
     best = -float('inf')
     for params in experiment_config:
-        epochs = 5
+        epochs = config['train']['epochs']
         model = TextClassificationModel(3, vocab).to(device)
         loss_fn = torch.nn.CrossEntropyLoss()
         model_path = config['TRAINED_MODEL_PATH']

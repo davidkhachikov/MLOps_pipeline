@@ -7,5 +7,7 @@ DOCKER_PORT: 5001
 WEB_PORT: 5155
 data:
   num_samples: 5
-  test_size: 0.2
+  test_size: 0.05
   random_state: 42
+train:
+  epochs: 10

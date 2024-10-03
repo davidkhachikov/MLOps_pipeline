@@ -91,6 +91,7 @@ def handle_initial_data(path_to_data):
     df['text'] = df['text'].astype('str')
     df['text'] = df['text'].apply(preprocessing_stage_text)
     df['target'] += 1
+    df = df.dropna()
     df.to_csv(path_to_data, index=False)
 
 

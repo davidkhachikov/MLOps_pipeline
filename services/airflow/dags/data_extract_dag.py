@@ -15,7 +15,7 @@ from train_model import train
 with open("./configs/main.yml", 'r') as file:
     config = yaml.safe_load(file)
 
-def initialize_current_version():
+def update_current_version():
     current_version = int(Variable.get(key='current_version', default_var=0))
     
     # Read the version from the YAML file
@@ -35,8 +35,8 @@ with DAG(
     max_active_runs=1
 ) as dag:
     update_sample_number_task = PythonOperator(
-        task_id="initialize_current_version",
-        python_callable=initialize_current_version
+        task_id="update_current_version",
+        python_callable=update_current_version
     )
 
     extract_task = PythonOperator(
@@ -69,21 +69,27 @@ with DAG(
         ]
     )
 
-    # script_path = f"{os.environ['PROJECTPATH']}/scripts/load_to_remote.sh"
-    # load_task = BashOperator(
-    #     task_id="commit_and_push_data",
-    #     bash_command=f"{script_path} {{ var.json.data.version }} {os.environ['PROJECTPATH']} false",
-    # )
-
     train_model_task = PythonOperator(
         task_id="learning_models",
         python_callable=train
     )
 
     move_model_for_docker_task = BashOperator(
-    task_id="copy-model",
-    bash_command="rsync -a models/best.pth code/deployment/api/model_dir/model.pth && " +
-                 "rsync -a code/models/models.py code/deployment/api/models.py"
+        task_id="copy-model",
+        bash_command=(
+            f"rsync -a {os.path.join(config['BASE_DIR'], './models/best.pth')} "
+            f"{os.path.join(config['BASE_DIR'], './code/deployment/api/model_dir/model.pth')} && "
+            f"rsync -a {os.path.join(config['BASE_DIR'], './code/models/models.py')} "
+            f"{os.path.join(config['BASE_DIR'], './code/deployment/api/models.py')}"
+        ),
     )
 
-    extract_task >> preprocess_task >> train_test_split_task >> move_model_for_docker_task >> update_sample_number_task
+    build_docker_image = BashOperator(
+        task_id='build_docker_image',
+        bash_command=(
+            f"docker-compose -f {os.path.join(config['BASE_DIR'], './code/deployment/docker-compose.yml')} build"
+        ),
+        dag=dag,
+    )
+
+    extract_task >> preprocess_task >> train_test_split_task >> train_model_task >> move_model_for_docker_task >> build_docker_image >> update_sample_number_task

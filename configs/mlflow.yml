@@ -2,7 +2,8 @@
   optimizer:
     module_name: torch.optim
     class_name: Adam
-    params: {}
+    params:
+      lr: 0.001
   scheduler:
     module_name: torch.optim.lr_scheduler
     class_name: ExponentialLR
@@ -13,7 +14,36 @@
   optimizer:
     module_name: torch.optim
     class_name: RMSprop
-    params: {}
+    params:
+      alpha: 0.99
+      eps: 0.00000001
+  scheduler:
+    module_name: torch.optim.lr_scheduler
+    class_name: ExponentialLR
+    params:
+      gamma: 0.95
+
+- name: "Adam_with_weight_decay"
+  optimizer:
+    module_name: torch.optim
+    class_name: Adam
+    params:
+      lr: 0.001
+      weight_decay: 0.00001
+  scheduler:
+    module_name: torch.optim.lr_scheduler
+    class_name: ExponentialLR
+    params:
+      gamma: 0.95
+
+- name: "RMSprop_with_centered"
+  optimizer:
+    module_name: torch.optim
+    class_name: RMSprop
+    params:
+      alpha: 0.99
+      eps: 0.00000001
+      centered: True
   scheduler:
     module_name: torch.optim.lr_scheduler
     class_name: ExponentialLR
