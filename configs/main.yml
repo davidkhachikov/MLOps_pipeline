@@ -10,4 +10,4 @@ data:
   test_size: 0.05
   random_state: 42
 train:
-  epochs: 10
+  epochs: 6

@@ -1,2 +1,2 @@
-model_dir
+model_dir/model.pth
 models.py

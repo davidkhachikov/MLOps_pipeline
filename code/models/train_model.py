@@ -120,11 +120,13 @@ def val_one_epoch(
             loop.set_postfix({"loss": val_loss / total, "acc": correct / total})
 
         accuracy = correct / total
-        if accuracy > best_so_far:
-            best_so_far = accuracy
+        loss_final = val_loss / total
+        print(loss_final, best_so_far)
+        if loss_final < best_so_far:
+            best_so_far = loss_final
             torch.save(model, ckpt_path)
 
-    return val_loss / total, accuracy
+    return loss_final, accuracy
 
 
 def train_model(
@@ -137,7 +139,7 @@ def train_model(
     epochs,
     model_path
 ):
-    best = -float('inf')
+    best = float('inf')
     for epoch in range(epochs):
         train_one_epoch(model, train_dataloader, optimizer, scheduler, loss_fn, epoch_num=epoch)
         best = val_one_epoch(model, val_dataloader, loss_fn, epoch, best_so_far=best, ckpt_path=model_path)
@@ -166,7 +168,7 @@ def setup_mlflow_experiment(experiment_name):
     return experiment
 
 
-def run_experiment(name, cfg, model, train_dataloader, val_dataloader, loss_fn, epochs, model_path, best=-float('inf')):
+def run_experiment(name, cfg, model, train_dataloader, val_dataloader, loss_fn, epochs, model_path, best=float('inf')):
     mlflow.set_tracking_uri("http://localhost:5000")
     experiment = setup_mlflow_experiment(name)
 
@@ -196,11 +198,11 @@ def run_experiment(name, cfg, model, train_dataloader, val_dataloader, loss_fn, 
             mlflow.log_metric("validation_loss", loss)
             mlflow.log_metric("validation_accuracy", acc)
 
-            if acc > best:
-                best = acc
+            if loss < best:
+                best = loss
         best_model = torch.load(model_path)
         mlflow.pytorch.log_model(best_model, f'{experiment}_model')
-        print(f"Experiment '{name}' completed. Best validation accuracy: {best}")
+        print(f"Experiment '{name}' completed. Best validation loss: {best}")
     mlflow.end_run()
     return best
 
@@ -219,7 +221,7 @@ def train():
     with open("./configs/mlflow.yml", 'r') as file:
         experiment_config = yaml.safe_load(file)
 
-    best = -float('inf')
+    best = float('inf')
     for params in experiment_config:
         epochs = config['train']['epochs']
         model = TextClassificationModel(3, vocab).to(device)
